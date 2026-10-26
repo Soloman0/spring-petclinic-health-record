@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" 
+      th:replace="~{fragments/layout :: layout (~{::body},'owners')}">
+<body>
+
+    <h2>Pet Health Record</h2>
+    <p>Managing record for: <strong th:text="${pet.name}">Pet Name</strong></p>
+
+    <!-- 表单提交到同一个 URL -->
+    <form th:object="${healthRecord}" method="post" class="form-horizontal">
+        
+        <!-- 体重 -->
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Weight (kg):</label>
+            <div class="col-sm-10">
+                <input type="number" step="0.1" min="0" th:field="*{weight}" class="form-control" placeholder="e.g. 12.5" />
+                <!-- 错误提示 -->
+                <span th:if="${#fields.hasErrors('weight')}" th:errors="*{weight}" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- 疫苗接种状态 -->
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Vaccinated:</label>
+            <div class="col-sm-10">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" th:field="*{vaccinated}" /> Check if vaccinated
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- 最近体检日期 -->
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Last Checkup Date:</label>
+            <div class="col-sm-10">
+                <input type="date" th:field="*{lastCheckupDate}" class="form-control" />
+                <span th:if="${#fields.hasErrors('lastCheckupDate')}" th:errors="*{lastCheckupDate}" class="text-danger"></span>
+            </div>
+        </div>
+
+        <!-- 提交按钮 -->
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-primary">Save Record</button>
+            </div>
+        </div>
+    </form>
+
+</body>
+</html>

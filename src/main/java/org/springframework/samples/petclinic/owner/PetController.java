@@ -33,10 +33,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
-
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
  * @author Juergen Hoeller
@@ -53,10 +52,13 @@ class PetController {
 	private final OwnerRepository owners;
 
 	private final PetTypeRepository types;
+	
+	private final HealthRecordRepository healthRecordRepository;// 1. 声明依赖
 
-	public PetController(OwnerRepository owners, PetTypeRepository types) {
+	public PetController(OwnerRepository owners, PetTypeRepository types, HealthRecordRepository healthRecordRepository) {
 		this.owners = owners;
 		this.types = types;
+		this.healthRecordRepository = healthRecordRepository;
 	}
 
 	@ModelAttribute("types")
@@ -176,6 +178,37 @@ class PetController {
 		}
 		redirectAttributes.addFlashAttribute("message", "Pet details has been edited");
 		return "redirect:/owners/{ownerId}";
+	}
+	
+	// 1. 展示表单
+	@GetMapping("/pets/{petId}/health/new")
+	public String initHealthRecordForm(@ModelAttribute("pet") Pet pet, // 注入查好的宠物
+			ModelMap model) {
+
+		// pet.getId() 查档案
+		HealthRecord record = healthRecordRepository.findByPetId(pet.getId());
+		if (record == null) {
+			record = new HealthRecord();
+		}
+		model.put("healthRecord", record);
+
+		return "pets/createOrUpdateHealthRecordForm";
+	}
+
+	// 2. 保存表单
+	@PostMapping("/pets/{petId}/health/new")
+	public String processHealthRecordForm(@PathVariable("ownerId") int ownerId, 
+			@ModelAttribute("pet") Pet pet, @Valid HealthRecord record, BindingResult result, ModelMap model) {
+
+		if (result.hasErrors()) {
+			return "pets/createOrUpdateHealthRecordForm";
+		}
+
+		record.setPet(pet);
+		this.healthRecordRepository.save(record);
+
+		// 从 URL 拿到 ownerId
+		return "redirect:/owners/" + ownerId;
 	}
 
 	/**

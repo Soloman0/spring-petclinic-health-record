@@ -70,6 +70,8 @@
           </tr>
           <tr>
             <td><a th:href="@{__${owner.id}__/pets/__${pet.id}__/edit}" th:text="#{editPet}">Edit Pet</a></td>
+            <!-- “健康档案”按钮 -->
+            <td><a th:href="@{/owners/{ownerId}/pets/{petId}/health/new(ownerId=${owner.id}, petId=${pet.id})}" class="btn btn-info">Health Record</a></td>
             <td><a th:href="@{__${owner.id}__/pets/__${pet.id}__/visits/new}" th:text="#{addVisit}">Add Visit</a></td>
           </tr>
         </table>
